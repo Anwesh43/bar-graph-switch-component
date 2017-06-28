@@ -28,6 +28,16 @@ class BarGraphSwitchComponent extends HTMLElement {
     }
     connectedCallback() {
         this.render()
+        this.img.onmousedown = (event) => {
+            const x = event.pageX,y = event.pageY
+            if(this.bars) {
+                this.bars.forEach((bar)=>{
+                    if(bar.handleTap(x,y) == true) {
+                        this.animationHandler.start(bar)
+                    }
+                })
+            }
+        }
     }
 }
 class BarGraphSwitch {
