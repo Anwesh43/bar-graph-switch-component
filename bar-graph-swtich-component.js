@@ -6,13 +6,25 @@ class BarGraphSwitchComponent extends HTMLElement {
         shadow.appendChild(this.img)
         this.n = this.getAttribute('n')
         this.color = this.getAttribute('color') || 'blue'
+        this.animationHandler = new AnimationHandler()
     }
     render() {
         const canvas = document.createElement('canvas')
         canvas.width = this.n*(w/15)
         canvas.height = h/3
         const context = canvas.getContext('2d')
-        this.img.src = canvas.toDataURL()
+        if(!this.bars) {
+            this.bars = []
+            const y = canvas.height/8
+            var x = 0
+            for(var i=0;i<this.n;i++) {
+                this.bars.push(new Bar(x,y,w/15,(canvas.height*7)/8))
+            }
+        }
+       this.bars.forEach((bar)=>{
+          bar.draw(context,this.color)
+       })
+       this.img.src = canvas.toDataURL()
     }
     connectedCallback() {
         this.render()
