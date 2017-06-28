@@ -4,7 +4,7 @@ class BarGraphSwitchComponent extends HTMLElement {
         const shadow = this.attachShadow({mode:'open'})
         this.img = document.createElement('img')
         shadow.appendChild(this.img)
-        this.n = this.getAttribute('n')
+        this.n = parseFloat(this.getAttribute('n'))||4
         this.color = this.getAttribute('color') || 'blue'
         this.animationHandler = new AnimationHandler()
     }
@@ -112,5 +112,5 @@ class AnimationHandler {
             },50)
         }
     }
-
 }
+customElements.define('bar-graph',BarGraphSwitchComponent)
