@@ -1,16 +1,17 @@
 const w = window.innerWidth,h = window.innerHeight
 class BarGraphSwitchComponent extends HTMLElement {
     constructor() {
+        super()
         const shadow = this.attachShadow({mode:'open'})
         this.img = document.createElement('img')
         shadow.appendChild(this.img)
         this.n = parseFloat(this.getAttribute('n'))||4
         this.color = this.getAttribute('color') || 'blue'
-        this.animationHandler = new AnimationHandler()
+        this.animationHandler = new AnimationHandler(this)
     }
     render() {
         const canvas = document.createElement('canvas')
-        canvas.width = this.n*(w/15)
+        canvas.width = this.n*(w/60)
         canvas.height = h/3
         const context = canvas.getContext('2d')
         if(!this.bars) {
@@ -18,7 +19,8 @@ class BarGraphSwitchComponent extends HTMLElement {
             const y = canvas.height/8
             var x = 0
             for(var i=0;i<this.n;i++) {
-                this.bars.push(new Bar(x,y,w/15,(canvas.height*7)/8))
+                this.bars.push(new BarGraphSwitch(x,y,w/60,(canvas.height*7)/8))
+                x+=w/60
             }
         }
        this.bars.forEach((bar)=>{
@@ -33,7 +35,7 @@ class BarGraphSwitchComponent extends HTMLElement {
             if(this.bars) {
                 this.bars.forEach((bar)=>{
                     if(bar.handleTap(x,y) == true) {
-                        this.animationHandler.start(bar)
+                        this.animationHandler.startAnimation(bar)
                     }
                 })
             }
@@ -82,7 +84,7 @@ class BarGraphSwitch {
         context.strokeStyle = color
         context.fillStyle = color
         context.strokeRect(this.x,this.y,this.w,this.h)
-        context.fillRect(this.x+this.h*(1-this.scale),this.y,this.w,this.h*this.scale)
+        context.fillRect(this.x,this.y+this.h*(1-this.scale),this.w,this.h*this.scale)
     }
     setUpdate(dir) {
         this.dir = dir
@@ -102,6 +104,9 @@ class AnimationHandler {
             switchBtn.setUpdate(1)
             const interval = setInterval(()=>{
                 this.component.render()
+                if(this.prevSwitch) {
+                    this.prevSwitch.update()
+                }
                 switchBtn.update()
                 if(switchBtn.stopped() == true) {
                     this.prevSwitch = switchBtn
