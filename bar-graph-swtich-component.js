@@ -36,7 +36,7 @@ class BarGraphSwitch {
         }
     }
     handleTap(x,y) {
-        const condition =  x > this.x && x < this.x+this.w && y>this.y && y<this.y+h && this.dir == 0
+        const condition =  x > this.x && x < this.x+this.w && y>this.y && y<this.y+h && this.dir == 0 && this.scale == 0
         if(condition) {
             this.startUpdating()
         }
@@ -53,10 +53,42 @@ class BarGraphSwitch {
             this.dir = 0
         }
     }
+    stopped() {
+        return this.dir == 0
+    }
     draw(context,color) {
         context.strokeStyle = color
         context.fillStyle = color
         context.strokeRect(this.x,this.y,this.w,this.h)
         context.fillRect(this.x+this.h*(1-this.scale),this.y,this.w,this.h*this.scale)
     }
+    setUpdate(dir) {
+        this.dir = dir
+    }
+}
+class AnimationHandler {
+    constructor(component) {
+        this.component = component
+        this.animated = false
+    }
+    startAnimation(switchBtn) {
+        if(this.animated == false) {
+            this.animated = true
+            if(this.prevSwitch) {
+                this.prevSwitch.setUpdate(-1)
+            }
+            switchBtn.setUpdate(1)
+            const interval = setInterval(()=>{
+                this.component.render()
+                switchBtn.update()
+                if(switchBtn.stopped() == true) {
+                    this.prevSwitch = switchBtn
+                    this.component.render()
+                    clearInterval(interval)
+                    this.animated = false
+                }
+            },50)
+        }
+    }
+
 }
